@@ -10,10 +10,12 @@ import (
 	s3sdk "github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
 	"github.com/caddyserver/caddy/v2"
+	"github.com/caddyserver/caddy/v2/caddyconfig/caddyfile"
 	"github.com/caddyserver/certmagic"
 	"go.uber.org/zap"
 	"io"
 	"io/fs"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -315,7 +317,42 @@ func (s3 *S3) Stat(ctx context.Context, key string) (certmagic.KeyInfo, error) {
 	return ki, nil
 }
 
+func parseBool(value string) (bool, error) {
+	return strconv.ParseBool(value)
+}
+
+func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
+	for d.Next() {
+		key := d.Val()
+		var value string
+
+		if !d.Args(&value) {
+			return d.ArgErr()
+		}
+
+		switch key {
+		case "bucket":
+			s3.Bucket = value
+		case "region":
+			s3.Region = value
+		default:
+			return d.Errf("unknown configuration option: %s", key)
+		}
+	}
+
+	if s3.Region == "" {
+		return d.Err("region is required")
+	}
+
+	if s3.Bucket == "" {
+		return d.Err("bucket is required")
+	}
+
+	return nil
+}
+
 var (
 	_ caddy.Provisioner      = (*S3)(nil)
 	_ caddy.StorageConverter = (*S3)(nil)
+	_ caddyfile.Unmarshaler  = (*S3)(nil)
 )
