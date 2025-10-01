@@ -338,6 +338,7 @@ func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
 	// 		}
 	// 	}
 	// }
+	d.Next()
 
 	for d.NextBlock(0) {
 		switch d.Val() {
