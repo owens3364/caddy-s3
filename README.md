@@ -12,7 +12,7 @@ This is as simple as possible so that I can get something working.
 I believe the caddyfile syntax to use it should be like this
 
 ```plaintext
-storage sthree {
+storage s3 {
   bucket "your-bucket-name"
   region "your-bucket-region"
 }

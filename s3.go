@@ -39,7 +39,7 @@ type S3 struct {
 
 func (s3 S3) CaddyModule() caddy.ModuleInfo {
 	return caddy.ModuleInfo{
-		ID: "caddy.storage.sthree",
+		ID: "caddy.storage.s3",
 		New: func() caddy.Module {
 			return new(S3)
 		},
@@ -322,6 +322,8 @@ func parseBool(value string) (bool, error) {
 }
 
 func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
+	var nesting = d.Nesting()
+	d.NextBlock(nesting)
 	for d.Next() {
 		key := d.Val()
 		var value string
