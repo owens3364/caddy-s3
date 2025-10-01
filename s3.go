@@ -322,50 +322,44 @@ func parseBool(value string) (bool, error) {
 }
 
 func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
-	for d.Next() { // advances to the next directive
-		fmt.Printf("Directive: %s (Nesting=%d)\n", d.Val(), d.Nesting())
+	// for d.Next() { // advances to the next directive
+	// 	fmt.Printf("Directive: %s (Nesting=%d)\n", d.Val(), d.Nesting())
 
-		// Print any arguments after the directive name
-		for d.NextArg() {
-			fmt.Printf("  Arg: %s\n", d.Val())
-		}
+	// 	// Print any arguments after the directive name
+	// 	for d.NextArg() {
+	// 		fmt.Printf("  Arg: %s\n", d.Val())
+	// 	}
 
-		// Handle nested blocks if present
-		for d.NextBlock(0) {
-			fmt.Printf("  Block start at nesting=%d\n", d.Nesting())
-			for d.NextArg() {
-				fmt.Printf("    Block Arg: %s\n", d.Val())
-			}
-		}
-	}
+	// 	// Handle nested blocks if present
+	// 	for d.NextBlock(0) {
+	// 		fmt.Printf("  Block start at nesting=%d\n", d.Nesting())
+	// 		for d.NextArg() {
+	// 			fmt.Printf("    Block Arg: %s\n", d.Val())
+	// 		}
+	// 	}
+	// }
 
-	fmt.Println("End of Caddyfile dump")
-	var nesting = d.Nesting()
-	d.NextBlock(nesting)
-	for d.Next() {
-		key := d.Val()
-		var value string
-
-		if !d.Args(&value) {
-			return d.ArgErr()
-		}
-
-		switch key {
+	for d.NextBlock(0) {
+		switch d.Val() {
 		case "bucket":
-			s3.Bucket = value
+			if !d.NextArg() {
+				return d.Err("bucket requires a value")
+			}
+			s3.Bucket = d.Val()
+
 		case "region":
-			s3.Region = value
+			if !d.NextArg() {
+				return d.Err("region requires a value")
+			}
+			s3.Region = d.Val()
+
 		default:
-			return d.Errf("unknown configuration option: %s", key)
+			return d.Errf("unrecognized directive in storage s3 block: %s", d.Val())
 		}
 	}
 
-	if s3.Region == "" {
-		return d.Err("region is required")
-	}
-
-	if s3.Bucket == "" {
-		return d.Err("bucket is required")
+	if s3.Bucket == "" || s3.Region == "" {
+		return d.Err("storage s3 requires both 'bucket' and 'region'")
 	}
 
 	return nil
