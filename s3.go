@@ -39,7 +39,7 @@ type S3 struct {
 
 func (s3 *S3) CaddyModule() caddy.ModuleInfo {
 	return caddy.ModuleInfo{
-		ID: "caddy.storage.s3",
+		ID: "caddy.storage.sthree",
 		New: func() caddy.Module {
 			return new(S3)
 		},
