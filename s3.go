@@ -321,23 +321,8 @@ func parseBool(value string) (bool, error) {
 	return strconv.ParseBool(value)
 }
 
+// fragile but works for me which is what I wanted
 func (s3 *S3) UnmarshalCaddyfile(d *caddyfile.Dispenser) error {
-	// for d.Next() { // advances to the next directive
-	// 	fmt.Printf("Directive: %s (Nesting=%d)\n", d.Val(), d.Nesting())
-
-	// 	// Print any arguments after the directive name
-	// 	for d.NextArg() {
-	// 		fmt.Printf("  Arg: %s\n", d.Val())
-	// 	}
-
-	// 	// Handle nested blocks if present
-	// 	for d.NextBlock(0) {
-	// 		fmt.Printf("  Block start at nesting=%d\n", d.Nesting())
-	// 		for d.NextArg() {
-	// 			fmt.Printf("    Block Arg: %s\n", d.Val())
-	// 		}
-	// 	}
-	// }
 	d.Next()
 
 	for d.NextBlock(0) {
