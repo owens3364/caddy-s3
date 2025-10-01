@@ -37,7 +37,7 @@ type S3 struct {
 	Region string `json:"region"`
 }
 
-func (s3 *S3) CaddyModule() caddy.ModuleInfo {
+func (s3 S3) CaddyModule() caddy.ModuleInfo {
 	return caddy.ModuleInfo{
 		ID: "caddy.storage.sthree",
 		New: func() caddy.Module {
@@ -47,11 +47,11 @@ func (s3 *S3) CaddyModule() caddy.ModuleInfo {
 }
 
 func init() {
-	caddy.RegisterModule(new(S3))
+	caddy.RegisterModule(S3{})
 }
 
-func (s3 *S3) CertMagicStorage() (certmagic.Storage, error) {
-	return s3, nil
+func (s3 S3) CertMagicStorage() (certmagic.Storage, error) {
+	return &s3, nil
 }
 
 func (s3 *S3) Provision(ctx caddy.Context) error {
